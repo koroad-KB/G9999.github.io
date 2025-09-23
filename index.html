@@ -2,46 +2,123 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>내 웹사이트</title>
+  <title>QR코드 안전 제보</title>
   <style>
     body {
-      text-align: center;
-      margin-top: 100px;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
     }
-    h1 {
+
+    header {
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .card {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
       color: #333;
     }
-    button {
-      padding: 15px 30px;
-      margin: 20px;
-      font-size: 18px;
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 12px 0;
+      font-size: 1.1rem;
+      font-weight: bold;
       border-radius: 12px;
       border: none;
       cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
       transition: background 0.3s;
     }
-    button:hover {
+
+    .btn-simple {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .btn-simple:hover {
       background-color: #45a049;
+    }
+
+    .btn-photo {
+      background-color: #3498db;
+      color: white;
+    }
+    .btn-photo:hover {
+      background-color: #2e86c1;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.6rem;
+      }
+      .card {
+        padding: 30px 20px;
+      }
+      .btn {
+        font-size: 1rem;
+        padding: 12px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>아래 버튼을 눌러 제보 해주세요</h1>
-  <p>"감사합니다!</p>
+  <header>
+    <h1>무인교통단속장비 안전 제보</h1>
+    <p>QR코드를 통해 접속해 주셔서 감사합니다</p>
+  </header>
 
-  <!-- 버튼1 -->
-  <button onclick="location.href='https://docs.google.com/forms/d/e/1FAIpQLSc9LYuppyt0ksIxcmGc8uamqOYfwIYv7CVbuuqe40UU45-XWA/viewform?usp=pp_url&entry.2116052852=G9999'">
-    초간단 제보(익명)
-  </button>
-  
-  <!-- 버튼2 -->
-  <button onclick="location.href='https://docs.google.com/forms/d/e/1FAIpQLScdStCSWj6u0puufCHF5ZXqPrYPMzacretyg-7kuOR3rig5IA/viewform?usp=pp_url&entry.2116052852=G9999'">
-    사진 제보(로그인 필요)
-  </button>
+  <div class="card">
+    <h2>제보 방법을 선택해주세요</h2>
+    <!-- 버튼1 -->
+    <button class="btn btn-simple"
+      onclick="location.href='https://docs.google.com/forms/d/e/1FAIpQLSc9LYuppyt0ksIxcmGc8uamqOYfwIYv7CVbuuqe40UU45-XWA/viewform?usp=pp_url&entry.2116052852=G9999'">
+      ✅ 간편 제보 (익명)
+    </button>
+    
+    <!-- 버튼2 -->
+    <button class="btn btn-photo"
+      onclick="location.href='https://docs.google.com/forms/d/e/1FAIpQLScdStCSWj6u0puufCHF5ZXqPrYPMzacretyg-7kuOR3rig5IA/viewform?usp=pp_url&entry.2116052852=G9999'">
+      📷 사진 제보 (로그인 필요)
+    </button>
+  </div>
+
+  <footer>
+    <p>여러분의 제보가 안전을 지킵니다 🙏</p>
+  </footer>
 </body>
 </html>
-
