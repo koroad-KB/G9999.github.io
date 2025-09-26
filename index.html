@@ -6,56 +6,79 @@
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background: #f5f7fa;
+      background: linear-gradient(135deg, #e0f7fa, #f5f7fa);
       margin: 0;
       padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      min-height: 150vh; /* 세로 1.5배로 변경 */
+      min-height: 150vh; /* 세로 1.5배 */
       text-align: center;
     }
 
+    header img {
+      max-width: 220px;
+      height: auto;
+      margin-bottom: 20px;
+      animation: fadeInDown 1s ease-out;
+    }
+
     header h1 {
-      font-size: 3.5rem; /* 더 크게 */
+      font-size: 3.5rem;
       color: #2c3e50;
-      margin: 40px 0 20px 0;
+      margin: 20px 0 10px 0;
       line-height: 1.3;
+      animation: fadeIn 1.2s ease-in-out;
     }
 
     header p {
-      font-size: 2rem; /* 안내문도 크게 */
+      font-size: 1.9rem;
       color: #555;
       margin-bottom: 50px;
+      animation: fadeIn 1.5s ease-in-out;
     }
 
     .card {
       background: #fff;
       padding: 60px 35px;
-      border-radius: 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border-radius: 25px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
       width: 100%;
-      max-width: 700px; /* 더 크게 */
+      max-width: 720px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 35px rgba(0,0,0,0.2);
     }
 
     .card h2 {
-      font-size: 2.4rem;
+      font-size: 2.5rem;
       margin-bottom: 40px;
       color: #333;
     }
 
     .btn {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
       width: 100%;
-      padding: 35px; /* 버튼 키우기 */
-      margin: 25px 0;
-      font-size: 2rem; /* 버튼 글씨 크게 */
+      padding: 28px;
+      margin: 20px 0;
+      font-size: 1.9rem;
       font-weight: bold;
-      border-radius: 20px;
+      border-radius: 16px;
       border: none;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
     }
 
     .btn-simple {
@@ -75,35 +98,58 @@
     }
 
     footer {
-      margin-top: 50px;
-      font-size: 1.6rem;
+      margin-top: 60px;
+      font-size: 1.4rem;
       color: #666;
+      opacity: 0.9;
+    }
+
+    /* 애니메이션 */
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    @keyframes fadeInDown {
+      from {opacity: 0; transform: translateY(-30px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(30px);}
+      to {opacity: 1; transform: translateY(0);}
     }
 
     /* 모바일 최적화 */
     @media (max-width: 600px) {
       body {
-        padding: 10px;
-        min-height: 150vh; /* 모바일에서도 동일 적용 */
+        padding: 12px;
+        min-height: 150vh;
+      }
+      header img {
+        max-width: 160px;
       }
       header h1 {
-        font-size: 3rem;
+        font-size: 2.8rem;
       }
       header p {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
       }
       .card {
-        padding: 50px 25px;
+        padding: 45px 25px;
       }
       .btn {
-        font-size: 1.8rem;
-        padding: 30px;
+        font-size: 1.7rem;
+        padding: 24px;
       }
     }
   </style>
 </head>
 <body>
   <header>
+    <!-- 호등이 캐릭터 -->
+    <img src="https://lh5.googleusercontent.com/proxy/chPKmTEHqEW5nVAkw9D3xlLrPrTCLugV_E5-jCHjUJXmyhHCtZIsB57UvEqDjRZyIIE2lvevw8gXaR83XHZWpH2t9fjEthmxKANyyi-GoUf-xahTSvsf943vsHrcwDmbexRLXE3Aevu9MI_taN-l3uwdLg" 
+       alt="호등이 캐릭터">
     <h1>무인교통단속장비<br>안전 제보</h1>
     <p>QR코드를 통해 접속해 주셔서 감사합니다</p>
   </header>
