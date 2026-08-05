@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8">
+
+<title>인천신호</title>
+
+<style>
+
+html,body,#map{
+
+width:100%;
+
+height:100%;
+
+margin:0;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=appkey=d1b45b81fdbbcf51dc6599c61fd53a5f&libraries=clusterer"></script>
+
+<script>
+
+const map=new kakao.maps.Map(
+
+document.getElementById("map"),
+
+{
+
+center:new kakao.maps.LatLng(36.4,128.1),
+
+level:12
+
+}
+
+);
+
+fetch("https://script.google.com/macros/s/AKfycbzMeGai92zW-Hmyp9tZbrIrEMv-xbdrefq6z_wlDHcSrvDfqt3Nyk88jHe9fQ6JOX0_/exec")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+const markers=[];
+
+data.forEach(item=>{
+
+const marker=new kakao.maps.Marker({
+
+position:new kakao.maps.LatLng(item.lat,item.lng)
+
+});
+
+const infowindow=new kakao.maps.InfoWindow({
+
+content:
+
+`<div style="padding:8px">
+
+<b>${item.name}</b><br>
+
+종류 : ${item.type}<br>
+
+속도 : ${item.speed}
+
+</div>`
+
+});
+
+kakao.maps.event.addListener(marker,"click",function(){
+
+infowindow.open(map,marker);
+
+});
+
+markers.push(marker);
+
+});
+
+const clusterer=new kakao.maps.MarkerClusterer({
+
+map:map,
+
+averageCenter:true,
+
+minLevel:8
+
+});
+
+clusterer.addMarkers(markers);
+
+});
+
+</script>
+
+</body>
+
+</html>
