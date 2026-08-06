@@ -117,23 +117,13 @@ let clickMarker = null;
 let clickLat = "";
 let clickLng = "";
   
-const map=new kakao.maps.Map(
-
-
-
-
-
-
-
-});
-document.getElementById("map"),
-
-{
-
-center:new kakao.maps.LatLng(37.4563,126.7052),
-level:8
-
-}
+const map = new kakao.maps.Map(
+    document.getElementById("map"),
+    {
+        center: new kakao.maps.LatLng(37.4563, 126.7052),
+        level: 8
+    }
+);
 kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
 
     const latlng = mouseEvent.latLng;
