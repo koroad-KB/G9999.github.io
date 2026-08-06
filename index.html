@@ -94,12 +94,10 @@ level:8
 );
 fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtIvkBFXHJ131caZgUHI4G99YDtIGlkNaIN-I/exec")
 
-.then(data=>{
+.then(res => res.json())
+.then(data => {
     signalData = data;
   
-.then(res=>res.json())
-
-.then(data=>{
 
 const markers=[];
 
