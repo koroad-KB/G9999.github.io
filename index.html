@@ -298,7 +298,9 @@ const item = signalData.find(x =>
     navigator.clipboard.writeText(clickLat + "," + clickLng);
 
     alert("위도·경도가 복사되었습니다.");
-function routeTo(lat,lng,name){
+
+};
+  function routeTo(lat,lng,name){
 
     const url =
     "https://map.kakao.com/link/to/" +
@@ -311,8 +313,6 @@ function routeTo(lat,lng,name){
     window.open(url,"_blank");
 
 }
-};
-  
 </script>
 
 </body>
