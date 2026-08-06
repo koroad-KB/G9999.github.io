@@ -2,7 +2,9 @@
 <html>
 
 <head>
-
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
 <meta charset="utf-8">
 
 <title>인천신호</title>
@@ -38,8 +40,7 @@ document.getElementById("map"),
 {
 
 center:new kakao.maps.LatLng(37.4563,126.7052),
-
-level:3
+level:8
 
 }
 
@@ -99,7 +100,8 @@ minLevel:8
 clusterer.addMarkers(markers);
 
 });
-
+const zoomControl = new kakao.maps.ZoomControl();
+map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 </script>
 
 </body>
