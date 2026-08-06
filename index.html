@@ -50,13 +50,47 @@ html, body, #map {
     font-size:16px;
     z-index:999;
 }
+#coordBox{
+    position:absolute;
+    bottom:20px;
+    left:10px;
+    background:white;
+    padding:10px;
+    border-radius:8px;
+    font-size:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    z-index:999;
+    min-width:180px;
+}
 
+#copyBtn{
+    position:absolute;
+    bottom:90px;
+    left:10px;
+    padding:8px 14px;
+    border:none;
+    border-radius:8px;
+    background:#1976d2;
+    color:white;
+    font-size:14px;
+    z-index:999;
+}
+  
 </style>
 
 </head>
 
 <body>
+  
+<div id="coordBox">
+    위도 : -<br>
+    경도 : -
+</div>
 
+<button id="copyBtn">
+📋 복사
+</button>
+  
 <div id="map"></div>
 
 <input
@@ -82,6 +116,31 @@ let signalData = [];
     
 const map=new kakao.maps.Map(
 
+  let clickMarker = null;
+let clickLat = "";
+let clickLng = "";
+
+kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+
+    const latlng = mouseEvent.latLng;
+
+    clickLat = latlng.getLat().toFixed(6);
+    clickLng = latlng.getLng().toFixed(6);
+
+    document.getElementById("coordBox").innerHTML =
+        "위도 : " + clickLat +
+        "<br>경도 : " + clickLng;
+
+    if(clickMarker){
+        clickMarker.setMap(null);
+    }
+
+    clickMarker = new kakao.maps.Marker({
+        map: map,
+        position: latlng
+    });
+
+});
 document.getElementById("map"),
 
 {
@@ -192,7 +251,18 @@ clusterer.addMarkers(markers);
         x.name.includes(keyword)
 
     );
+document.getElementById("copyBtn").onclick = function(){
 
+    if(clickLat==""){
+        alert("먼저 지도를 클릭하세요.");
+        return;
+    }
+
+    navigator.clipboard.writeText(clickLat + "," + clickLng);
+
+    alert("위도·경도가 복사되었습니다.");
+
+};
     if(!item){
 
         alert("검색 결과가 없습니다.");
