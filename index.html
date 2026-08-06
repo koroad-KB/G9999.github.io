@@ -123,18 +123,7 @@ const map=new kakao.maps.Map(
 
 
 
-    document.getElementById("coordBox").innerHTML =
-        "위도 : " + clickLat +
-        "<br>경도 : " + clickLng;
 
-    if(clickMarker){
-        clickMarker.setMap(null);
-    }
-
-    clickMarker = new kakao.maps.Marker({
-        map: map,
-        position: latlng
-    });
 
 });
 document.getElementById("map"),
@@ -151,6 +140,19 @@ kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
 
     clickLat = latlng.getLat().toFixed(6);
     clickLng = latlng.getLng().toFixed(6);
+  
+      document.getElementById("coordBox").innerHTML =
+        "위도 : " + clickLat +
+        "<br>경도 : " + clickLng;
+
+    if(clickMarker){
+        clickMarker.setMap(null);
+    }
+
+    clickMarker = new kakao.maps.Marker({
+        map: map,
+        position: latlng
+    });
 );
 
 fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtIvkBFXHJ131caZgUHI4G99YDtIGlkNaIN-I/exec")
