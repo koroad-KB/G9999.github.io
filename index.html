@@ -162,20 +162,31 @@ position:new kakao.maps.LatLng(item.lat,item.lng)
 
 });
 
-const infowindow=new kakao.maps.InfoWindow({
+const infowindow = new kakao.maps.InfoWindow({
 
-content:
+content: `
+<div style="padding:10px;font-size:16px;line-height:1.6;">
+    <b>${item.name}</b><br>
+    수정날짜 : ${item.type}<br><br>
 
-`<div style="padding:8px">
-
-<b>${item.name}</b><br>
-
-수정날짜 : ${item.type}<br>
-
-
-</div>`
+    <button onclick="routeTo(${item.lat},${item.lng},'${item.name}')"
+        style="
+            width:100%;
+            padding:10px;
+            background:#FEE500;
+            border:none;
+            border-radius:6px;
+            font-size:16px;
+            font-weight:bold;
+            cursor:pointer;">
+        🧭 길찾기
+    </button>
+</div>
+`
 
 });
+
+
 
 kakao.maps.event.addListener(marker,"click",function(){
 
@@ -287,8 +298,21 @@ const item = signalData.find(x =>
     navigator.clipboard.writeText(clickLat + "," + clickLng);
 
     alert("위도·경도가 복사되었습니다.");
+function routeTo(lat,lng,name){
 
+    const url =
+    "https://map.kakao.com/link/to/" +
+    encodeURIComponent(name) +
+    "," +
+    lat +
+    "," +
+    lng;
+
+    window.open(url,"_blank");
+
+}
 };
+  
 </script>
 
 </body>
