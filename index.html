@@ -113,12 +113,13 @@ placeholder="신호기 검색">
   
 let signalData = [];
 
-    
-const map=new kakao.maps.Map(
-
-  let clickMarker = null;
+let clickMarker = null;
 let clickLat = "";
 let clickLng = "";
+  
+const map=new kakao.maps.Map(
+
+
 
 kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
 
@@ -151,6 +152,8 @@ level:8
 }
 
 );
+  kakao.maps.event.addListener(map,'click',function(mouseEvent){
+    });
 fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtIvkBFXHJ131caZgUHI4G99YDtIGlkNaIN-I/exec")
 
 .then(res => res.json())
@@ -251,18 +254,7 @@ clusterer.addMarkers(markers);
         x.name.includes(keyword)
 
     );
-document.getElementById("copyBtn").onclick = function(){
 
-    if(clickLat==""){
-        alert("먼저 지도를 클릭하세요.");
-        return;
-    }
-
-    navigator.clipboard.writeText(clickLat + "," + clickLng);
-
-    alert("위도·경도가 복사되었습니다.");
-
-};
     if(!item){
 
         alert("검색 결과가 없습니다.");
@@ -295,6 +287,18 @@ document.getElementById("copyBtn").onclick = function(){
     }
 
 });
+  document.getElementById("copyBtn").onclick = function(){
+
+    if(clickLat==""){
+        alert("먼저 지도를 클릭하세요.");
+        return;
+    }
+
+    navigator.clipboard.writeText(clickLat + "," + clickLng);
+
+    alert("위도·경도가 복사되었습니다.");
+
+};
 </script>
 
 </body>
