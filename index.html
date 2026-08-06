@@ -11,17 +11,46 @@
 
 <style>
 
-html,body,#map{
-
-width:100%;
-
-height:100%;
-
-margin:0;
-
+html, body, #map {
+    width:100%;
+    height:100%;
+    margin:0;
 }
 
-  
+#gpsBtn{
+    position:absolute;
+    right:15px;
+    bottom:20px;
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    border:none;
+    background:white;
+    font-size:24px;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    z-index:999;
+}
+
+#searchBox{
+    position:absolute;
+    top:10px;
+    left:10px;
+    width:220px;
+    height:40px;
+    font-size:18px;
+    padding-left:10px;
+    z-index:999;
+}
+
+#searchBtn{
+    position:absolute;
+    top:10px;
+    left:240px;
+    height:44px;
+    font-size:16px;
+    z-index:999;
+}
+
 </style>
 
 </head>
@@ -29,38 +58,29 @@ margin:0;
 <body>
 
 <div id="map"></div>
-  <button id="gpsBtn">📍</button>
-  #gpsBtn{
 
-position:absolute;
+<input
+id="searchBox"
+type="text"
+placeholder="신호기 검색">
 
-right:15px;
+<button id="searchBtn">
+검색
+</button>
 
-bottom:20px;
-
-width:55px;
-
-height:55px;
-
-border-radius:50%;
-
-border:none;
-
-background:white;
-
-font-size:24px;
-
-box-shadow:0 2px 8px rgba(0,0,0,.3);
-
-z-index:999;
-
-}
+<button id="gpsBtn">
+📍
+</button>
   
 
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d1b45b81fdbbcf51dc6599c61fd53a5f&libraries=clusterer"></script>
 
 <script>
-
+  
+let signalData = [];
+  .then(data=>{
+    signalData = data;
+    
 const map=new kakao.maps.Map(
 
 document.getElementById("map"),
@@ -161,6 +181,50 @@ clusterer.addMarkers(markers);
     });
 
 };
+    document.getElementById("searchBtn").onclick=function(){
+
+    const keyword=document.getElementById("searchBox").value.trim();
+
+    if(keyword=="") return;
+
+    const item=signalData.find(x=>
+
+        x.name.includes(keyword)
+
+    );
+
+    if(!item){
+
+        alert("검색 결과가 없습니다.");
+
+        return;
+
+    }
+
+    map.setCenter(
+
+        new kakao.maps.LatLng(
+
+            Number(item.lat),
+
+            Number(item.lng)
+
+        )
+
+    );
+
+    map.setLevel(2);
+
+};
+    document.getElementById("searchBox").addEventListener("keydown",function(e){
+
+    if(e.key==="Enter"){
+
+        document.getElementById("searchBtn").click();
+
+    }
+
+});
 </script>
 
 </body>
