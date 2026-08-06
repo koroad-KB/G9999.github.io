@@ -121,12 +121,7 @@ const map=new kakao.maps.Map(
 
 
 
-kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
 
-    const latlng = mouseEvent.latLng;
-
-    clickLat = latlng.getLat().toFixed(6);
-    clickLng = latlng.getLng().toFixed(6);
 
     document.getElementById("coordBox").innerHTML =
         "위도 : " + clickLat +
@@ -150,10 +145,14 @@ center:new kakao.maps.LatLng(37.4563,126.7052),
 level:8
 
 }
+kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
 
+    const latlng = mouseEvent.latLng;
+
+    clickLat = latlng.getLat().toFixed(6);
+    clickLng = latlng.getLng().toFixed(6);
 );
-  kakao.maps.event.addListener(map,'click',function(mouseEvent){
-    });
+
 fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtIvkBFXHJ131caZgUHI4G99YDtIGlkNaIN-I/exec")
 
 .then(res => res.json())
