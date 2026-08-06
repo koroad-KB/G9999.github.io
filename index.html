@@ -20,7 +20,7 @@ height:100%;
 margin:0;
 
 }
-<button id="gpsBtn">📍</button>
+
   
 </style>
 
@@ -29,6 +29,33 @@ margin:0;
 <body>
 
 <div id="map"></div>
+  <button id="gpsBtn">📍</button>
+  #gpsBtn{
+
+position:absolute;
+
+right:15px;
+
+bottom:20px;
+
+width:55px;
+
+height:55px;
+
+border-radius:50%;
+
+border:none;
+
+background:white;
+
+font-size:24px;
+
+box-shadow:0 2px 8px rgba(0,0,0,.3);
+
+z-index:999;
+
+}
+  
 
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d1b45b81fdbbcf51dc6599c61fd53a5f&libraries=clusterer"></script>
 
@@ -100,8 +127,40 @@ minLevel:8
 clusterer.addMarkers(markers);
 
 });
-const zoomControl = new kakao.maps.ZoomControl();
-map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+  document.getElementById("gpsBtn").onclick=function(){
+
+    if(!navigator.geolocation){
+
+        alert("현재 위치를 사용할 수 없습니다.");
+
+        return;
+
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position){
+
+        const lat=position.coords.latitude;
+
+        const lng=position.coords.longitude;
+
+        const loc=new kakao.maps.LatLng(lat,lng);
+
+        map.setCenter(loc);
+
+        map.setLevel(3);
+
+        new kakao.maps.Marker({
+
+            map:map,
+
+            position:loc
+
+        });
+
+    });
+
+};
 </script>
 
 </body>
