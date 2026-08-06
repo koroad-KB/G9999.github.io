@@ -248,9 +248,8 @@ clusterer.addMarkers(markers);
 
     if(keyword=="") return;
 
-    const item=signalData.find(x=>
-
-        x.name.includes(keyword)
+const item = signalData.find(x =>
+    x.name && x.name.includes(keyword)
 
     );
 
