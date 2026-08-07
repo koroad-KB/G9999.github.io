@@ -601,7 +601,221 @@ document.getElementById("searchBox").addEventListener("keydown",function(e){
 }
 
 };
-  
+let skyViewMode = false;
+
+document.getElementById("skyBtn").onclick = function(){
+
+    skyViewMode = !skyViewMode;
+
+    if(skyViewMode){
+
+        map.setMapTypeId(kakao.maps.MapTypeId.SKYVIEW);
+
+        this.style.background = "#4CAF50";
+        this.innerHTML = "🗺️";
+
+    }else{
+
+        map.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);
+
+        this.style.background = "white";
+        this.innerHTML = "☁️";
+    }
+
+};
+
+
+// ========================================
+// 거리재기
+// ========================================
+
+let distanceMode = false;
+
+let distancePoints = [];
+
+let distanceLine = null;
+
+let distanceMarkers = [];
+
+
+// 거리 계산 함수
+function getDistance(p1, p2){
+
+    const lat1 = p1.getLat();
+    const lon1 = p1.getLng();
+
+    const lat2 = p2.getLat();
+    const lon2 = p2.getLng();
+
+    const R = 6371000;
+
+    const dLat = (lat2-lat1) * Math.PI / 180;
+    const dLon = (lon2-lon1) * Math.PI / 180;
+
+    const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+
+    const c = 2 * Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1-a)
+    );
+
+    return R * c;
+}
+
+
+// 거리재기 버튼
+document.getElementById("distanceBtn").onclick = function(){
+
+    distanceMode = !distanceMode;
+
+    if(distanceMode){
+
+        this.style.background = "#4CAF50";
+        this.innerHTML = "❌";
+
+        distancePoints = [];
+
+        document.getElementById("distanceBox").style.display = "block";
+        document.getElementById("distanceBox").innerHTML =
+            "📏 지도를 클릭하세요";
+
+    }else{
+
+        this.style.background = "white";
+        this.innerHTML = "📏";
+
+        clearDistance();
+
+    }
+
+};
+
+
+// 지도 클릭 시 거리 측정
+kakao.maps.event.addListener(map, "click", function(mouseEvent){
+
+    if(!distanceMode){
+        return;
+    }
+
+    const point = mouseEvent.latLng;
+
+    distancePoints.push(point);
+
+
+    // 측정 지점 표시
+    const marker = new kakao.maps.Marker({
+        map: map,
+        position: point
+    });
+
+    distanceMarkers.push(marker);
+
+
+    // 두 번째 점부터 선 표시
+    if(distancePoints.length >= 2){
+
+        if(distanceLine){
+            distanceLine.setMap(null);
+        }
+
+        distanceLine = new kakao.maps.Polyline({
+
+            map: map,
+
+            path: distancePoints,
+
+            strokeWeight: 4,
+
+            strokeColor: "#1976D2",
+
+            strokeOpacity: 0.8,
+
+            strokeStyle: "solid"
+
+        });
+
+
+        // 전체 거리 계산
+        let totalDistance = 0;
+
+        for(let i = 1; i < distancePoints.length; i++){
+
+            totalDistance += getDistance(
+                distancePoints[i-1],
+                distancePoints[i]
+            );
+
+        }
+
+
+        let text;
+
+        if(totalDistance >= 1000){
+
+            text =
+                "📏 거리 : " +
+                (totalDistance / 1000).toFixed(2) +
+                " km";
+
+        }else{
+
+            text =
+                "📏 거리 : " +
+                Math.round(totalDistance) +
+                " m";
+
+        }
+
+
+        document.getElementById("distanceBox").innerHTML =
+            text +
+            "<br><span style='font-size:11px;font-weight:normal;'>지점을 계속 클릭하세요</span>";
+
+    }else{
+
+        document.getElementById("distanceBox").innerHTML =
+            "📏 첫 번째 지점 선택<br>" +
+            "<span style='font-size:11px;font-weight:normal;'>두 번째 지점을 클릭하세요</span>";
+
+    }
+
+});
+
+
+// 거리 측정 초기화
+function clearDistance(){
+
+    distanceMode = false;
+
+    distancePoints = [];
+
+
+    if(distanceLine){
+
+        distanceLine.setMap(null);
+
+        distanceLine = null;
+
+    }
+
+
+    distanceMarkers.forEach(function(marker){
+
+        marker.setMap(null);
+
+    });
+
+    distanceMarkers = [];
+
+
+    document.getElementById("distanceBox").style.display = "none";
+
+}  
 </script>
 
 </body>
