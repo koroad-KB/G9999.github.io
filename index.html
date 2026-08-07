@@ -341,9 +341,9 @@ function createMarkers(data){
     data.forEach(item=>{
 const image = new kakao.maps.MarkerImage(
     "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
-    new kakao.maps.Size(50,50)
+    new kakao.maps.Size(1,1)
 );
-  );
+
   
   const marker = new kakao.maps.Marker({
       position: new kakao.maps.LatLng(item.lat, item.lng),
