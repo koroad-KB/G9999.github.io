@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+<meta charset="utf-8">
+
+<title>인천신호</title>
+
+<style>
+
+html, body, #map {
+    width:100%;
+    height:100%;
+    margin:0;
+}
+
+#gpsBtn{
+    position:absolute;
+    right:15px;
+    bottom:20px;
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    border:none;
+    background:white;
+    font-size:24px;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    z-index:999;
+}
+
+  
+#searchBox{
+    position:absolute;
+    top:10px;
+    left:10px;
+    width:220px;
+    height:40px;
+    font-size:18px;
+    padding-left:10px;
+    z-index:999;
+}
+
+#searchBtn{
+    position:absolute;
+    top:10px;
+    left:240px;
+    height:44px;
+    font-size:16px;
+    z-index:999;
+}
+#coordBox{
+    display:none;
+    position:absolute;
+    bottom:20px;
+    left:10px;
+    background:white;
+    padding:10px;
+    border-radius:8px;
+    font-size:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    z-index:999;
+    min-width:180px;
+}
+
+#copyBtn{
+    display:none;
+    position:absolute;
+    bottom:90px;
+    left:10px;
+    padding:8px 14px;
+    border:none;
+    border-radius:8px;
+    background:#1976d2;
+    color:white;
+    font-size:14px;
+    z-index:999;
+  }
+
+  #coordBtn{
+    position:absolute;
+    bottom:150px;
+    left:10px;
+    width:55px;
+    height:55px;
+    border:none;
+    border-radius:50%;
+    background:white;
+    font-size:24px;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    z-index:999;
+}
+
+  
+</style>
+
+</head>
+
+<body>
+
+  <button id="coordBtn">
+📌
+</button>
+  
+<div id="coordBox">
+    위도 : -<br>
+    경도 : -
+</div>
+
+ 
+  
+<button id="copyBtn">
+📋
+</button>
+  
+<div id="map"></div>
+
+<input
+id="searchBox"
+type="text"
+placeholder="신호기 검색">
+
+<button id="searchBtn">
+검색
+</button>
+
+<button id="gpsBtn">
+📍
+</button>
+  
+
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d1b45b81fdbbcf51dc6599c61fd53a5f&libraries=clusterer"></script>
+
+<script>
+let currentInfoWindow = null;  
+let signalData = [];
+
+let clickMarker = null;
+let clickLat = "";
+let clickLng = "";
+let coordMode = false;
+  
+const map = new kakao.maps.Map(
+    document.getElementById("map"),
+    {
+        center: new kakao.maps.LatLng(37.4563, 126.7052),
+        level: 8
+    }
+);
+kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+    if(currentInfoWindow){
+        currentInfoWindow.close();
+        currentInfoWindow = null;
+    }
+  if(!coordMode){
+    return;
+}
+coordMode = false;
+
+document.getElementById("coordBtn").style.background="white";
+document.getElementById("coordBtn").innerHTML="📍";
+document.getElementById("copyBtn").style.display="block";
+    const latlng = mouseEvent.latLng;
+
+    clickLat = latlng.getLat().toFixed(6);
+    clickLng = latlng.getLng().toFixed(6);
+  
+      document.getElementById("coordBox").innerHTML =
+        "위도 : " + clickLat +
+        "<br>경도 : " + clickLng;
+  document.getElementById("coordBox").style.display = "block";
+
+    if(clickMarker){
+        clickMarker.setMap(null);
+    }
+
+    clickMarker = new kakao.maps.Marker({
+        map: map,
+        position: latlng
+    });
+});
+
+fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtIvkBFXHJ131caZgUHI4G99YDtIGlkNaIN-I/exec")
+
+.then(res => res.json())
+.then(data => {
+    signalData = data;
+  
+
+const markers = [];
+const overlays = [];
+
+data.forEach(item=>{
+const image = new kakao.maps.MarkerImage(
+    "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+    new kakao.maps.Size(50, 50)
+);
+
+const marker = new kakao.maps.Marker({
+    position: new kakao.maps.LatLng(item.lat, item.lng),
+    image: image
+});
+const overlay = new kakao.maps.CustomOverlay({
+    position: new kakao.maps.LatLng(item.lat, item.lng),
+    yAnchor: 2.2,
+    content: `
+        <div style="
+            background:white;
+            border:1px solid #999;
+            border-radius:4px;
+            padding:2px 6px;
+            font-size:15px;
+            font-weight:bold;
+            white-space:nowrap;
+            box-shadow:0 1px 4px rgba(0,0,0,.3);
+        ">
+            ${item.name}
+        </div>
+    `
+});
+
+overlay.setMap(map);
+  overlays.push(overlay);
+
+const infowindow = new kakao.maps.InfoWindow({
+
+content: `
+<div style="padding:10px;font-size:16px;line-height:1.6;">
+    <b>${item.name}</b><br>
+    수정날짜 : ${item.type}<br><br>
+
+    <div style="display:flex;gap:6px;">
+
+        <button
+            onclick="routeTo(${item.lat},${item.lng},'${item.name}')"
+            style="
+        flex:1;
+        padding:6px;
+        background:#FEE500;
+        border:none;
+        border-radius:6px;
+        font-size:11px;
+        font-weight:bold;
+        cursor:pointer;">
+    🧭 길찾기
+        </button>
+
+        <button
+            onclick="roadView(${item.lat},${item.lng})"
+            style="
+        flex:1;
+        padding:6px;
+        background:#4CAF50;
+        color:white;
+        border:none;
+        border-radius:6px;
+        font-size:11px;
+        font-weight:bold;
+        cursor:pointer;">
+    👀 로드뷰
+        </button>
+
+    </div>
+
+</div>
+`
+
+});
+
+
+
+kakao.maps.event.addListener(marker, "click", function(){
+
+    if(currentInfoWindow){
+        currentInfoWindow.close();
+    }
+
+    infowindow.open(map, marker);
+    currentInfoWindow = infowindow;
+
+});
+
+markers.push(marker);
+
+});
+
+const clusterer=new kakao.maps.MarkerClusterer({
+
+map:map,
+
+averageCenter:true,
+
+minLevel:8
+
+});
+
+clusterer.addMarkers(markers);
+  function updateOverlayVisible(){
+
+    const level = map.getLevel();
+
+    overlays.forEach(function(overlay){
+
+        if(level >= 8){
+            overlay.setMap(null);      // 이름 숨김
+        }else{
+            overlay.setMap(map);       // 이름 표시
+        }
+
+    });
+
+}
+
+updateOverlayVisible();
+
+kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
+
+});
+
+  document.getElementById("gpsBtn").onclick=function(){
+
+    if(!navigator.geolocation){
+
+        alert("현재 위치를 사용할 수 없습니다.");
+
+        return;
+
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position){
+
+        const lat=position.coords.latitude;
+
+        const lng=position.coords.longitude;
+
+        const loc=new kakao.maps.LatLng(lat,lng);
+
+        map.setCenter(loc);
+
+        map.setLevel(3);
+
+        new kakao.maps.Marker({
+
+            map:map,
+
+            position:loc
+
+        });
+
+    });
+
+};
+    document.getElementById("searchBtn").onclick=function(){
+
+    const keyword=document.getElementById("searchBox").value.trim();
+
+    if(keyword=="") return;
+
+const item = signalData.find(x =>
+    x.name && x.name.includes(keyword)
+
+    );
+
+    if(!item){
+
+        alert("검색 결과가 없습니다.");
+
+        return;
+
+    }
+
+    map.setCenter(
+
+        new kakao.maps.LatLng(
+
+            Number(item.lat),
+
+            Number(item.lng)
+
+        )
+
+    );
+
+    map.setLevel(2);
+
+};
+    document.getElementById("searchBox").addEventListener("keydown",function(e){
+
+    if(e.key==="Enter"){
+
+        document.getElementById("searchBtn").click();
+
+    }
+
+});
+  document.getElementById("copyBtn").onclick = function(){
+
+    if(clickLat==""){
+        alert("먼저 지도를 클릭하세요.");
+        return;
+    }
+
+    navigator.clipboard.writeText(clickLat + "," + clickLng);
+
+
+};
+  function routeTo(lat,lng,name){
+
+    const url =
+    "https://map.kakao.com/link/to/" +
+    encodeURIComponent(name) +
+    "," +
+    lat +
+    "," +
+    lng;
+
+    window.open(url,"_blank");
+
+}
+  function roadView(lat, lng){
+
+    const url =
+    "https://map.kakao.com/link/roadview/" +
+    lat + "," + lng;
+
+    window.open(url, "_blank");
+
+}
+  
+  document.getElementById("coordBtn").onclick = function(){
+
+    coordMode = !coordMode;
+
+    if(coordMode){
+      document.getElementById("coordBox").style.display = "none";
+        this.style.background="#4CAF50";
+        this.innerHTML="✅";
+}else{
+    this.style.background = "white";
+    this.innerHTML = "📌";
+    document.getElementById("coordBox").style.display = "none";
+    document.getElementById("copyBtn").style.display = "none";
+
+    if(clickMarker){
+        clickMarker.setMap(null);
+        clickMarker = null;
+    }
+}
+
+};
+  
+</script>
+
+</body>
+
+</html>
