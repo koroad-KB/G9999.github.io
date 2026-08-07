@@ -66,6 +66,7 @@ html, body, #map {
 }
 
 #copyBtn{
+    display:none;
     position:absolute;
     bottom:90px;
     left:10px;
@@ -156,7 +157,7 @@ coordMode = false;
 
 document.getElementById("coordBtn").style.background="white";
 document.getElementById("coordBtn").innerHTML="📍";
-  
+document.getElementById("copyBtn").style.display="block";
     const latlng = mouseEvent.latLng;
 
     clickLat = latlng.getLat().toFixed(6);
@@ -385,10 +386,17 @@ const item = signalData.find(x =>
         this.style.background="#4CAF50";
         this.innerHTML="✅";
         alert("좌표 선택 모드입니다.\n지도를 터치하세요.");
-    }else{
-        this.style.background="white";
-        this.innerHTML="📍";
+}else{
+    this.style.background = "white";
+    this.innerHTML = "📌";
+    document.getElementById("coordBox").style.display = "none";
+    document.getElementById("copyBtn").style.display = "none";
+
+    if(clickMarker){
+        clickMarker.setMap(null);
+        clickMarker = null;
     }
+}
 
 };
   
