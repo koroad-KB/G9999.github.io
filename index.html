@@ -444,46 +444,52 @@ kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
     });
 
 };
-    document.getElementById("searchBtn").onclick=function(){
+document.getElementById("searchBtn").onclick=function(){
 
-    const keyword=document.getElementById("searchBox").value.trim();
+    const searchBox = document.getElementById("searchBox");
 
-    if(keyword=="") return;
+    const keyword = searchBox.value.trim();
 
-const item = signalData.find(x =>
-    x.name && x.name.includes(keyword)
+    if(keyword == "") {
+        searchBox.blur();
+        return;
+    }
 
+    const item = signalData.find(x =>
+        x.name && x.name.includes(keyword)
     );
 
     if(!item){
 
         alert("검색 결과가 없습니다.");
 
-        return;
+        searchBox.blur();
 
+        return;
     }
 
     map.setCenter(
-
         new kakao.maps.LatLng(
-
             Number(item.lat),
-
             Number(item.lng)
-
         )
-
     );
 
     map.setLevel(2);
 
-};
-    document.getElementById("searchBox").addEventListener("keydown",function(e){
+searchBox.value = ""; 
+searchBox.blur();
 
-    if(e.key==="Enter"){
+};
+document.getElementById("searchBox").addEventListener("keydown",function(e){
+
+    if(e.key === "Enter"){
+
+        e.preventDefault();
 
         document.getElementById("searchBtn").click();
 
+        this.blur();
     }
 
 });
