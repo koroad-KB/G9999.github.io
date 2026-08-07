@@ -201,18 +201,39 @@ content: `
     <b>${item.name}</b><br>
     수정날짜 : ${item.type}<br><br>
 
-    <button onclick="routeTo(${item.lat},${item.lng},'${item.name}')"
-        style="
-            width:100%;
-            padding:10px;
-            background:#FEE500;
-            border:none;
-            border-radius:6px;
-            font-size:16px;
-            font-weight:bold;
-            cursor:pointer;">
-        🧭 길찾기
-    </button>
+    <div style="display:flex;gap:6px;">
+
+        <button
+            onclick="routeTo(${item.lat},${item.lng},'${item.name}')"
+            style="
+                flex:1;
+                padding:8px;
+                background:#FEE500;
+                border:none;
+                border-radius:6px;
+                font-size:14px;
+                font-weight:bold;
+                cursor:pointer;">
+            🧭 길찾기
+        </button>
+
+        <button
+            onclick="roadView(${item.lat},${item.lng})"
+            style="
+                flex:1;
+                padding:8px;
+                background:#4CAF50;
+                color:white;
+                border:none;
+                border-radius:6px;
+                font-size:14px;
+                font-weight:bold;
+                cursor:pointer;">
+            👀 로드뷰
+        </button>
+
+    </div>
+
 </div>
 `
 
@@ -345,6 +366,16 @@ const item = signalData.find(x =>
     window.open(url,"_blank");
 
 }
+  function roadView(lat, lng){
+
+    const url =
+    "https://map.kakao.com/link/roadview/" +
+    lat + "," + lng;
+
+    window.open(url, "_blank");
+
+}
+  
   document.getElementById("coordBtn").onclick = function(){
 
     coordMode = !coordMode;
