@@ -222,11 +222,24 @@ const clusterer = new kakao.maps.MarkerClusterer({
   }
     
   
-  const markers = [];
-  const overlays = [];
-  
-  
-  
+const overlays = [];
+
+function createMarkers(data){
+
+    const markers = [];
+
+    data.forEach(item=>{
+
+        ...
+
+    });
+
+    clusterer.clear();
+    clusterer.addMarkers(markers);
+
+    updateOverlayVisible();
+
+}
   
     function updateOverlayVisible(){
   
@@ -248,7 +261,6 @@ const clusterer = new kakao.maps.MarkerClusterer({
   
   kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
   
-  );
   
     document.getElementById("gpsBtn").onclick=function(){
   
@@ -428,12 +440,16 @@ const clusterer = new kakao.maps.MarkerClusterer({
   
   });
   
-  markers.push(marker);
-  
-  });
-  
-  
-  }
+markers.push(marker);
+
+});
+
+clusterer.clear();
+clusterer.addMarkers(markers);
+
+updateOverlayVisible();
+
+}
     function routeTo(lat,lng,name){
   
       const url =
