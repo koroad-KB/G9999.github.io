@@ -144,18 +144,20 @@
   let clickLng = "";
   let coordMode = false;
     
-  const map = new kakao.maps.Map(
-      document.getElementById("map"),
-      {
-          center: new kakao.maps.LatLng(37.4563, 126.7052),
-          level: 8
-      }
-    const clusterer = new kakao.maps.MarkerClusterer({
-      map: map,
-      averageCenter: true,
-      minLevel: 8
-  });
-  );
+const map = new kakao.maps.Map(
+    document.getElementById("map"),
+    {
+        center: new kakao.maps.LatLng(37.4563, 126.7052),
+        level: 8
+    }
+);
+
+const clusterer = new kakao.maps.MarkerClusterer({
+    map: map,
+    averageCenter: true,
+    minLevel: 8
+});
+    
   kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
       if(currentInfoWindow){
           currentInfoWindow.close();
@@ -246,7 +248,7 @@
   
   kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
   
-  });
+  );
   
     document.getElementById("gpsBtn").onclick=function(){
   
@@ -430,17 +432,6 @@
   
   });
   
-      const markers = [];
-  
-      data.forEach(item=>{
-  
-          // ↓↓↓ 현재 data.forEach 안에 있는 내용을
-          // 그대로 여기로 복사
-  
-      });
-  
-      clusterer.clear();
-      clusterer.addMarkers(markers);
   
   }
     function routeTo(lat,lng,name){
