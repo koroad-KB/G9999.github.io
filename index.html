@@ -192,7 +192,7 @@ fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtI
 const markers = [];
 const overlays = [];
 
-```javascript
+
 data.forEach(item => {
 
     // ========================================
@@ -244,9 +244,7 @@ data.forEach(item => {
     overlays.push(overlay);
 
 
-    // ========================================
-    // ③ 상세정보창
-    // ========================================
+
     const infowindow = new kakao.maps.InfoWindow({
 
         content: `
