@@ -195,15 +195,38 @@ const overlays = [];
 ```javascript
 data.forEach(item => {
 
-    // 신호기의 실제 위도·경도
+    // ========================================
+    // 신호기의 실제 위치
+    // ========================================
     const position = new kakao.maps.LatLng(
         Number(item.lat),
         Number(item.lng)
     );
 
-    // =========================
+
+    // ========================================
     // ① 신호기 이름
-    // =========================
+    // ========================================
+    const nameDiv = document.createElement("div");
+
+    nameDiv.style.cssText = `
+        background:white;
+        border:1px solid #777;
+        border-radius:5px;
+        padding:4px 8px;
+        font-size:15px;
+        font-weight:bold;
+        white-space:nowrap;
+        box-shadow:0 1px 4px rgba(0,0,0,.3);
+        cursor:pointer;
+    `;
+
+    nameDiv.innerHTML = item.name;
+
+
+    // ========================================
+    // ② 이름을 실제 좌표의 정확한 중심에 배치
+    // ========================================
     const overlay = new kakao.maps.CustomOverlay({
 
         position: position,
@@ -213,37 +236,17 @@ data.forEach(item => {
 
         clickable: true,
 
-        content: `
-            <div
-                class="signal-name"
-                style="
-                    background:white;
-                    border:1px solid #777;
-                    border-radius:5px;
-                    padding:4px 8px;
-                    font-size:15px;
-                    font-weight:bold;
-                    white-space:nowrap;
-                    box-shadow:0 1px 4px rgba(0,0,0,.3);
-                    cursor:pointer;
-                    transform:translate(-50%,-50%);
-                "
-            >
-                ${item.name}
-            </div>
-        `
+        content: nameDiv
     });
 
-    // 지도에 이름 표시
     overlay.setMap(map);
 
-    // 기존 overlays 배열에 저장
     overlays.push(overlay);
 
 
-    // =========================
-    // ② 상세정보
-    // =========================
+    // ========================================
+    // ③ 상세정보창
+    // ========================================
     const infowindow = new kakao.maps.InfoWindow({
 
         content: `
@@ -251,6 +254,7 @@ data.forEach(item => {
                 padding:10px;
                 font-size:16px;
                 line-height:1.6;
+                min-width:180px;
             ">
 
                 <b>${item.name}</b><br>
@@ -310,55 +314,34 @@ data.forEach(item => {
     });
 
 
-    // =========================
-    // ③ 이름 클릭 이벤트
-    // =========================
-    const nameElement =
-        overlay.getContent();
+    // ========================================
+    // ④ 이름 클릭 → 상세정보
+    // ========================================
+    nameDiv.onclick = function(e) {
+
+        e.stopPropagation();
+
+        if(currentInfoWindow){
+            currentInfoWindow.close();
+        }
+
+        infowindow.setPosition(position);
+        infowindow.open(map);
+
+        currentInfoWindow = infowindow;
+    };
 
 
-    // CustomOverlay의 content가 문자열이므로
-    // 실제 DOM은 지도에 표시된 후 찾아줍니다.
-    setTimeout(function(){
-
-        const elements =
-            document.querySelectorAll(".signal-name");
-
-        elements.forEach(function(element){
-
-            if(element.innerText === item.name){
-
-element.onclick = function(e){
-
-    e.stopPropagation();
-
-    if(currentInfoWindow){
-        currentInfoWindow.close();
-    }
-
-    infowindow.setPosition(position);
-    infowindow.open(map);
-
-    currentInfoWindow = infowindow;
-};
-
-            }
-
-        });
-
-    }, 0);
-
-
-    // =========================
-    // ④ 클러스터링용 투명 Marker
-    // =========================
+    // ========================================
+    // ⑤ 투명 Marker
+    //    → 클러스터링 + 실제 위치 클릭용
+    // ========================================
     const image = new kakao.maps.MarkerImage(
 
         "data:image/gif;base64," +
         "R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
 
-        new kakao.maps.Size(1,1)
-
+        new kakao.maps.Size(1, 1)
     );
 
 
@@ -369,11 +352,12 @@ element.onclick = function(e){
         image: image,
 
         clickable: true
-
     });
 
 
-    // Marker를 클릭해도 상세정보 표시
+    // ========================================
+    // ⑥ 투명 Marker 클릭
+    // ========================================
     kakao.maps.event.addListener(
         marker,
         "click",
@@ -383,10 +367,10 @@ element.onclick = function(e){
                 currentInfoWindow.close();
             }
 
-            infowindow.open(map, marker);
+            infowindow.setPosition(position);
+            infowindow.open(map);
 
             currentInfoWindow = infowindow;
-
         }
     );
 
