@@ -339,9 +339,10 @@ function createMarkers(data){
     const markers = [];
 
     data.forEach(item=>{
-  const image = new kakao.maps.MarkerImage(
-      "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
-      new kakao.maps.Size(50, 50)
+const image = new kakao.maps.MarkerImage(
+    "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+    new kakao.maps.Size(50,50)
+);
   );
   
   const marker = new kakao.maps.Marker({
