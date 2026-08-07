@@ -464,37 +464,110 @@ kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
 
 });
 
-  document.getElementById("gpsBtn").onclick=function(){
+let myLocationMarker = null;
+
+document.getElementById("gpsBtn").onclick = function(){
 
     if(!navigator.geolocation){
 
         alert("현재 위치를 사용할 수 없습니다.");
-
         return;
 
     }
 
-    navigator.geolocation.getCurrentPosition(function(position){
+    const gpsBtn = this;
 
-        const lat=position.coords.latitude;
+    // 누르는 즉시 버튼 표시 변경
+    gpsBtn.style.background = "#E3F2FD";
+    gpsBtn.innerHTML = "⏳";
 
-        const lng=position.coords.longitude;
+    navigator.geolocation.getCurrentPosition(
 
-        const loc=new kakao.maps.LatLng(lat,lng);
+        function(position){
 
-        map.setCenter(loc);
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
 
-        map.setLevel(3);
+            const loc = new kakao.maps.LatLng(lat, lng);
 
-        new kakao.maps.Marker({
+            // 기존 위치 마커 제거
+            if(myLocationMarker){
+                myLocationMarker.setMap(null);
+            }
 
-            map:map,
+            // 현재 위치 표시
+            myLocationMarker = new kakao.maps.Marker({
+                map: map,
+                position: loc
+            });
 
-            position:loc
+            // 지도 이동
+            map.setCenter(loc);
+            map.setLevel(3);
 
-        });
+            // 버튼 원래대로
+            gpsBtn.style.background = "white";
+            gpsBtn.innerHTML = `
+                <svg viewBox="0 0 64 64" width="38" height="38">
+                    <circle cx="32" cy="32" r="18"
+                            fill="none"
+                            stroke="#1976D2"
+                            stroke-width="3"/>
 
-    });
+                    <line x1="32" y1="10" x2="32" y2="21"
+                          stroke="#1976D2"
+                          stroke-width="3"
+                          stroke-linecap="round"/>
+
+                    <line x1="32" y1="43" x2="32" y2="54"
+                          stroke="#1976D2"
+                          stroke-width="3"
+                          stroke-linecap="round"/>
+
+                    <line x1="10" y1="32" x2="21" y2="32"
+                          stroke="#1976D2"
+                          stroke-width="3"
+                          stroke-linecap="round"/>
+
+                    <line x1="43" y1="32" x2="54" y2="32"
+                          stroke="#1976D2"
+                          stroke-width="3"
+                          stroke-linecap="round"/>
+
+                    <circle cx="32" cy="32" r="4"
+                            fill="#1976D2"/>
+                </svg>
+            `;
+
+        },
+
+        function(error){
+
+            gpsBtn.style.background = "white";
+            gpsBtn.innerHTML = "📍";
+
+            if(error.code === 1){
+                alert("위치 정보 사용이 차단되어 있습니다.");
+            }
+            else if(error.code === 2){
+                alert("현재 위치를 확인할 수 없습니다.");
+            }
+            else if(error.code === 3){
+                alert("현재 위치 확인 시간이 초과되었습니다.");
+            }
+            else{
+                alert("현재 위치를 확인할 수 없습니다.");
+            }
+
+        },
+
+        {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 60000
+        }
+
+    );
 
 };
 document.getElementById("searchBtn").onclick=function(){
