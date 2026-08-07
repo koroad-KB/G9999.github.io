@@ -31,6 +31,7 @@ html, body, #map {
     z-index:999;
 }
 
+  
 #searchBox{
     position:absolute;
     top:10px;
@@ -51,6 +52,7 @@ html, body, #map {
     z-index:999;
 }
 #coordBox{
+    display:none;
     position:absolute;
     bottom:20px;
     left:10px;
@@ -74,19 +76,40 @@ html, body, #map {
     color:white;
     font-size:14px;
     z-index:999;
+  }
+
+  #coordBtn{
+    position:absolute;
+    bottom:150px;
+    left:10px;
+    width:55px;
+    height:55px;
+    border:none;
+    border-radius:50%;
+    background:white;
+    font-size:24px;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    z-index:999;
 }
+
   
 </style>
 
 </head>
 
 <body>
+
+  <button id="coordBtn">
+📍 좌표
+</button>
   
 <div id="coordBox">
     위도 : -<br>
     경도 : -
 </div>
 
+ 
+  
 <button id="copyBtn">
 📋 복사
 </button>
@@ -116,6 +139,7 @@ let signalData = [];
 let clickMarker = null;
 let clickLat = "";
 let clickLng = "";
+let coordMode = false;
   
 const map = new kakao.maps.Map(
     document.getElementById("map"),
@@ -125,7 +149,14 @@ const map = new kakao.maps.Map(
     }
 );
 kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+  if(!coordMode){
+    return;
+}
+coordMode = false;
 
+document.getElementById("coordBtn").style.background="white";
+document.getElementById("coordBtn").innerHTML="📍";
+  
     const latlng = mouseEvent.latLng;
 
     clickLat = latlng.getLat().toFixed(6);
@@ -134,6 +165,7 @@ kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
       document.getElementById("coordBox").innerHTML =
         "위도 : " + clickLat +
         "<br>경도 : " + clickLng;
+  document.getElementById("coordBox").style.display = "block";
 
     if(clickMarker){
         clickMarker.setMap(null);
@@ -313,6 +345,22 @@ const item = signalData.find(x =>
     window.open(url,"_blank");
 
 }
+  document.getElementById("coordBtn").onclick = function(){
+
+    coordMode = !coordMode;
+
+    if(coordMode){
+      document.getElementById("coordBox").style.display = "none";
+        this.style.background="#4CAF50";
+        this.innerHTML="✅";
+        alert("좌표 선택 모드입니다.\n지도를 터치하세요.");
+    }else{
+        this.style.background="white";
+        this.innerHTML="📍";
+    }
+
+};
+  
 </script>
 
 </body>
