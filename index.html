@@ -335,6 +335,10 @@ const overlays = [];
   
   };
 function createMarkers(data){
+    overlays.forEach(o => o.setMap(null));
+    overlays.length = 0;
+
+    clusterer.clear();
 
     const markers = [];
 
