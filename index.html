@@ -204,7 +204,8 @@ const marker = new kakao.maps.Marker({
 });
 const overlay = new kakao.maps.CustomOverlay({
     position: new kakao.maps.LatLng(item.lat, item.lng),
-    yAnchor: 2.2,
+    xAnchor: 0.5,
+    yAnchor: 0.5,
     content: `
         <div style="
             background:white;
