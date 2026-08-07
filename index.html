@@ -192,101 +192,209 @@ fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtI
 const markers = [];
 const overlays = [];
 
-data.forEach(item=>{
-const image = new kakao.maps.MarkerImage(
-    "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
-    new kakao.maps.Size(80, 80)
-);
+```javascript
+data.forEach(item => {
 
-const marker = new kakao.maps.Marker({
-    position: new kakao.maps.LatLng(item.lat, item.lng),
-    image: image
-});
-const overlay = new kakao.maps.CustomOverlay({
-    position: new kakao.maps.LatLng(item.lat, item.lng),
-    xAnchor: 0.5,
-    yAnchor: 0.5,
-    content: `
-        <div style="
-            background:white;
-            border:1px solid #999;
-            border-radius:4px;
-            padding:3px 7px;
-            font-size:15px;
-            font-weight:bold;
-            white-space:nowrap;
-            box-shadow:0 1px 4px rgba(0,0,0,.3);
-            transform:translate(-50%,-50%);
-        ">
-            ${item.name}
-        </div>
-    `
-});
+    // 신호기의 실제 위도·경도
+    const position = new kakao.maps.LatLng(
+        Number(item.lat),
+        Number(item.lng)
+    );
 
-overlay.setMap(map);
-  overlays.push(overlay);
+    // =========================
+    // ① 신호기 이름
+    // =========================
+    const overlay = new kakao.maps.CustomOverlay({
 
-const infowindow = new kakao.maps.InfoWindow({
+        position: position,
 
-content: `
-<div style="padding:10px;font-size:16px;line-height:1.6;">
-    <b>${item.name}</b><br>
-    수정날짜 : ${item.type}<br><br>
+        xAnchor: 0.5,
+        yAnchor: 0.5,
 
-    <div style="display:flex;gap:6px;">
+        clickable: true,
 
-        <button
-            onclick="routeTo(${item.lat},${item.lng},'${item.name}')"
-            style="
-        flex:1;
-        padding:6px;
-        background:#FEE500;
-        border:none;
-        border-radius:6px;
-        font-size:11px;
-        font-weight:bold;
-        cursor:pointer;">
-    🧭 길찾기
-        </button>
+        content: `
+            <div
+                class="signal-name"
+                style="
+                    background:white;
+                    border:1px solid #777;
+                    border-radius:5px;
+                    padding:4px 8px;
+                    font-size:15px;
+                    font-weight:bold;
+                    white-space:nowrap;
+                    box-shadow:0 1px 4px rgba(0,0,0,.3);
+                    cursor:pointer;
+                    transform:translate(-50%,-50%);
+                "
+            >
+                ${item.name}
+            </div>
+        `
+    });
 
-        <button
-            onclick="roadView(${item.lat},${item.lng})"
-            style="
-        flex:1;
-        padding:6px;
-        background:#4CAF50;
-        color:white;
-        border:none;
-        border-radius:6px;
-        font-size:11px;
-        font-weight:bold;
-        cursor:pointer;">
-    👀 로드뷰
-        </button>
+    // 지도에 이름 표시
+    overlay.setMap(map);
 
-    </div>
-
-</div>
-`
-
-});
+    // 기존 overlays 배열에 저장
+    overlays.push(overlay);
 
 
+    // =========================
+    // ② 상세정보
+    // =========================
+    const infowindow = new kakao.maps.InfoWindow({
 
-kakao.maps.event.addListener(marker, "click", function(){
+        content: `
+            <div style="
+                padding:10px;
+                font-size:16px;
+                line-height:1.6;
+            ">
+
+                <b>${item.name}</b><br>
+
+                수정날짜 : ${item.type}<br><br>
+
+                <div style="
+                    display:flex;
+                    gap:6px;
+                ">
+
+                    <button
+                        onclick="routeTo(
+                            ${item.lat},
+                            ${item.lng},
+                            '${item.name}'
+                        )"
+                        style="
+                            flex:1;
+                            padding:6px;
+                            background:#FEE500;
+                            border:none;
+                            border-radius:6px;
+                            font-size:11px;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        🧭 길찾기
+                    </button>
+
+
+                    <button
+                        onclick="roadView(
+                            ${item.lat},
+                            ${item.lng}
+                        )"
+                        style="
+                            flex:1;
+                            padding:6px;
+                            background:#4CAF50;
+                            color:white;
+                            border:none;
+                            border-radius:6px;
+                            font-size:11px;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+                        👀 로드뷰
+                    </button>
+
+                </div>
+
+            </div>
+        `
+    });
+
+
+    // =========================
+    // ③ 이름 클릭 이벤트
+    // =========================
+    const nameElement =
+        overlay.getContent();
+
+
+    // CustomOverlay의 content가 문자열이므로
+    // 실제 DOM은 지도에 표시된 후 찾아줍니다.
+    setTimeout(function(){
+
+        const elements =
+            document.querySelectorAll(".signal-name");
+
+        elements.forEach(function(element){
+
+            if(element.innerText === item.name){
+
+element.onclick = function(e){
+
+    e.stopPropagation();
 
     if(currentInfoWindow){
         currentInfoWindow.close();
     }
 
-    infowindow.open(map, marker);
+    infowindow.setPosition(position);
+    infowindow.open(map);
+
     currentInfoWindow = infowindow;
+};
+
+            }
+
+        });
+
+    }, 0);
+
+
+    // =========================
+    // ④ 클러스터링용 투명 Marker
+    // =========================
+    const image = new kakao.maps.MarkerImage(
+
+        "data:image/gif;base64," +
+        "R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=",
+
+        new kakao.maps.Size(1,1)
+
+    );
+
+
+    const marker = new kakao.maps.Marker({
+
+        position: position,
+
+        image: image,
+
+        clickable: true
+
+    });
+
+
+    // Marker를 클릭해도 상세정보 표시
+    kakao.maps.event.addListener(
+        marker,
+        "click",
+        function(){
+
+            if(currentInfoWindow){
+                currentInfoWindow.close();
+            }
+
+            infowindow.open(map, marker);
+
+            currentInfoWindow = infowindow;
+
+        }
+    );
+
+
+    markers.push(marker);
 
 });
 
-markers.push(marker);
-
-});
 
 const clusterer=new kakao.maps.MarkerClusterer({
 
