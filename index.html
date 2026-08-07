@@ -189,7 +189,8 @@ fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtI
     signalData = data;
   
 
-const markers=[];
+const markers = [];
+const overlays = [];
 
 data.forEach(item=>{
 const image = new kakao.maps.MarkerImage(
@@ -221,6 +222,7 @@ const overlay = new kakao.maps.CustomOverlay({
 });
 
 overlay.setMap(map);
+  overlays.push(overlay);
 
 const infowindow = new kakao.maps.InfoWindow({
 
@@ -295,6 +297,25 @@ minLevel:8
 });
 
 clusterer.addMarkers(markers);
+  function updateOverlayVisible(){
+
+    const level = map.getLevel();
+
+    overlays.forEach(function(overlay){
+
+        if(level >= 8){
+            overlay.setMap(null);      // 이름 숨김
+        }else{
+            overlay.setMap(map);       // 이름 표시
+        }
+
+    });
+
+}
+
+updateOverlayVisible();
+
+kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
 
 });
 
