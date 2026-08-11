@@ -513,7 +513,17 @@ groupResults.forEach(function(item){
     }
 
 });
+map.setBounds(bounds);
 
+groupResults.forEach(function(item){
+
+    const index = signalData.indexOf(item);
+
+    if(overlays[index]){
+        overlays[index].setMap(map);
+    }
+
+});
 }
 document.getElementById("gpsBtn").onclick = function(){
 
