@@ -274,10 +274,12 @@ data.forEach(item => {
         cursor:pointer;
     `;
 
- nameDiv.innerHTML =
-    item.code + "(" +
-    item.group + ")-" +
-    item.name;
+nameDiv.innerHTML =
+    `<span style="color:${item.codeColor || '#000000'}">${item.code}</span>` +
+    `<span style="color:#555555"> (</span>` +
+    `<span style="color:${item.groupColor || '#000000'}">${item.group}</span>` +
+    `<span style="color:#555555">)-</span>` +
+    `<span style="color:${item.nameColor || '#000000'}">${item.name}</span>`;
 
     // ========================================
     // ② 이름을 실제 좌표의 정확한 중심에 배치
