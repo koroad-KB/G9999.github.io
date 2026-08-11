@@ -489,42 +489,34 @@ kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
 });
 
 let myLocationMarker = null;
-  function updateOverlayVisible(){
+
+
+// ========================================
+// 신호기 이름 표시 여부
+// 7단계 이상 → 이름 숨김
+// 6단계 이하 → 이름 표시
+// ========================================
+
+function updateOverlayVisible(){
 
     const level = map.getLevel();
 
     overlays.forEach(function(overlay){
 
-groupResults.forEach(function(item){
+        if(level >= 7){
 
-    const index = signalData.indexOf(item);
+            overlay.setMap(null);
 
-    if(index !== -1){
+        }else{
 
-        if(markers[index]){
-            markers[index].setMap(map);
-            groupMarkers.push(markers[index]);
+            overlay.setMap(map);
+
         }
 
-        if(overlays[index]){
-            overlays[index].setMap(map);
-        }
+    });
 
-    }
-
-});
-map.setBounds(bounds);
-
-groupResults.forEach(function(item){
-
-    const index = signalData.indexOf(item);
-
-    if(overlays[index]){
-        overlays[index].setMap(map);
-    }
-
-});
 }
+  
 document.getElementById("gpsBtn").onclick = function(){
 
     if(!navigator.geolocation){
