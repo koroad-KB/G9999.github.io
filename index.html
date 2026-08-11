@@ -135,6 +135,20 @@ html, body, #map {
     z-index:999;
 }
 
+  #allBtn{
+    position:absolute;
+    top:10px;
+    left:310px;
+    height:44px;
+    padding:0 12px;
+    font-size:16px;
+    font-weight:bold;
+    background:white;
+    border:1px solid #aaa;
+    border-radius:5px;
+    z-index:999;
+    box-shadow:0 2px 5px rgba(0,0,0,.2);
+}
   
 </style>
 
@@ -160,12 +174,16 @@ html, body, #map {
 <div id="map"></div>
 
 <input
-id="searchBox"
-type="text"
-placeholder="신호기 검색">
+    id="searchBox"
+    type="text"
+    placeholder="신호기·신호군 검색">
 
 <button id="searchBtn">
-검색
+    검색
+</button>
+
+<button id="allBtn">
+    전체
 </button>
 <button id="skyBtn">
 ✈️
@@ -189,6 +207,8 @@ placeholder="신호기 검색">
 <script>
 let currentInfoWindow = null;  
 let signalData = [];
+  let markers = [];
+let overlays = [];
 
 let clickMarker = null;
 let clickLat = "";
@@ -239,15 +259,13 @@ fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtI
 
 .then(res => res.json())
 .then(data => {
+
     signalData = data;
-  
 
-const markers = [];
-const overlays = [];
-const numberOverlays = [];
+    markers = [];
+    overlays = [];
 
-
-data.forEach(item => {
+    data.forEach(item => {
 
     // ========================================
     // 신호기의 실제 위치
@@ -449,8 +467,9 @@ const infowindow = new kakao.maps.InfoWindow({
 
 });
 
-
-const clusterer=new kakao.maps.MarkerClusterer({
+let clusterer = null;
+  
+clusterer = new kakao.maps.MarkerClusterer({
 
 map:map,
 
@@ -599,40 +618,62 @@ document.getElementById("searchBtn").onclick = function(){
         return;
     }
 
-    // ========================================
-    // ① 신호기군 검색
-    // ========================================
-    const groupResults = signalData.filter(item =>
-        String(item.group || "").trim().toUpperCase() === keyword.toUpperCase()
-    );
+    // ====================================
+    // ① 신호군 검색
+    // 예: 996G, 72G, 270G
+    // ====================================
+
+    const groupResults = signalData.filter(function(item){
+
+        return String(item.group)
+            .trim()
+            .toUpperCase() === keyword.toUpperCase();
+
+    });
 
 
-    // ========================================
-    // ② 신호기군이 검색된 경우
-    // ========================================
     if(groupResults.length > 0){
 
-        // 기존 지도 위치를 기준으로 전체 신호군이 보이도록 설정
-        const bounds = new kakao.maps.LatLngBounds();
+        // 기존 모든 장비 숨기기
+        markers.forEach(function(marker){
+            marker.setMap(null);
+        });
 
-        groupResults.forEach(item => {
+        overlays.forEach(function(overlay){
+            overlay.setMap(null);
+        });
 
-            const position = new kakao.maps.LatLng(
-                Number(item.lat),
-                Number(item.lng)
-            );
+        // 검색된 신호군만 표시
+        groupResults.forEach(function(item){
 
-            bounds.extend(position);
+            const index = signalData.indexOf(item);
+
+            if(markers[index]){
+                markers[index].setMap(map);
+            }
+
+            if(overlays[index]){
+                overlays[index].setMap(map);
+            }
 
         });
 
-        // 해당 신호군 전체가 화면에 들어오도록 이동
-        map.setBounds(bounds);
 
-        // 너무 확대되는 것을 방지
-        if(groupResults.length === 1){
-            map.setLevel(4);
-        }
+        // 검색된 신호군 전체가 보이도록 범위 설정
+        const bounds = new kakao.maps.LatLngBounds();
+
+        groupResults.forEach(function(item){
+
+            bounds.extend(
+                new kakao.maps.LatLng(
+                    Number(item.lat),
+                    Number(item.lng)
+                )
+            );
+
+        });
+
+        map.setBounds(bounds);
 
         searchBox.value = "";
         searchBox.blur();
@@ -641,18 +682,21 @@ document.getElementById("searchBtn").onclick = function(){
     }
 
 
-    // ========================================
-    // ③ 신호기명 / 신호기코드 검색
-    // ========================================
-    const item = signalData.find(x =>
-        (x.name && String(x.name).includes(keyword)) ||
-        String(x.code || "").includes(keyword)
-    );
+    // ====================================
+    // ② 일반 신호기 검색
+    // 예: 4005
+    // ====================================
+
+    const item = signalData.find(function(x){
+
+        return (
+            String(x.code).includes(keyword) ||
+            (x.name && x.name.includes(keyword))
+        );
+
+    });
 
 
-    // ========================================
-    // ④ 검색 결과 없음
-    // ========================================
     if(!item){
 
         alert("검색 결과가 없습니다.");
@@ -663,9 +707,20 @@ document.getElementById("searchBtn").onclick = function(){
     }
 
 
-    // ========================================
-    // ⑤ 개별 신호기 위치로 이동
-    // ========================================
+    // ====================================
+    // 모든 장비 다시 표시
+    // ====================================
+
+    markers.forEach(function(marker){
+        marker.setMap(map);
+    });
+
+
+    // 이름 표시 여부는 현재 줌레벨에 따라 결정
+    updateOverlayVisible();
+
+
+    // 검색된 장비 위치로 이동
     const position = new kakao.maps.LatLng(
         Number(item.lat),
         Number(item.lng)
@@ -673,13 +728,22 @@ document.getElementById("searchBtn").onclick = function(){
 
     map.setCenter(position);
 
-    map.setLevel(2);
+    // 신호기 이름이 보이는 단계
+    map.setLevel(6);
+
 
     searchBox.value = "";
     searchBox.blur();
 
 };
-document.getElementById("searchBox").addEventListener("keydown",function(e){
+
+
+// ========================================
+// Enter 키 검색
+// ========================================
+
+document.getElementById("searchBox")
+.addEventListener("keydown", function(e){
 
     if(e.key === "Enter"){
 
@@ -688,9 +752,39 @@ document.getElementById("searchBox").addEventListener("keydown",function(e){
         document.getElementById("searchBtn").click();
 
         this.blur();
+
     }
 
 });
+
+
+// ========================================
+// 전체 버튼
+// ========================================
+
+document.getElementById("allBtn").onclick = function(){
+
+    // 모든 Marker 복구
+    markers.forEach(function(marker){
+        marker.setMap(map);
+    });
+
+
+    // 현재 줌 단계에 맞게 이름 복구
+    updateOverlayVisible();
+
+
+    // 인천 전체가 적당히 보이도록 이동
+    map.setCenter(
+        new kakao.maps.LatLng(
+            37.4563,
+            126.7052
+        )
+    );
+
+    map.setLevel(8);
+
+};
   document.getElementById("copyBtn").onclick = function(){
 
     if(clickLat==""){
