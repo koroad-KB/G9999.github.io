@@ -244,6 +244,7 @@ fetch("https://script.google.com/macros/s/AKfycbybhRXaSQfsKlM8V1UnPVD21WQLmoJLtI
 
 const markers = [];
 const overlays = [];
+const numberOverlays = [];
 
 
 data.forEach(item => {
@@ -466,7 +467,7 @@ clusterer.addMarkers(markers);
 
     overlays.forEach(function(overlay){
 
-        if(level >= 6){
+        if(level >= 7){
             overlay.setMap(null);      // 이름 숨김
         }else{
             overlay.setMap(map);       // 이름 표시
