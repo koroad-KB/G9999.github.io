@@ -303,7 +303,7 @@ data.forEach(item => {
 const infowindow = new kakao.maps.InfoWindow({
 
     content: `
-        <div style="
+            <div style="
             padding:12px;
             font-size:14px;
             line-height:1.7;
@@ -322,13 +322,9 @@ const infowindow = new kakao.maps.InfoWindow({
 
             <div>
                 <b>지역</b> : ${item.region || "-"}<br>
-
                 <b>지자체</b> : ${item.local || "-"}<br>
-
                 <b>경찰서</b> : ${item.police || "-"}<br>
-
                 <b>보호구역</b> : ${item.protectedArea || "-"}<br>
-
                 <b>스마트교차로</b> : ${item.smart || "-"}
             </div>
 
@@ -384,59 +380,6 @@ const infowindow = new kakao.maps.InfoWindow({
         </div>
     `
 });
-
-                <div style="
-                    display:flex;
-                    gap:6px;
-                ">
-
-                    <button
-                        onclick="routeTo(
-                            ${item.lat},
-                            ${item.lng},
-                            '${item.name}'
-                        )"
-                        style="
-                            flex:1;
-                            padding:6px;
-                            background:#FEE500;
-                            border:none;
-                            border-radius:6px;
-                            font-size:11px;
-                            font-weight:bold;
-                            cursor:pointer;
-                        "
-                    >
-                        🧭 길찾기
-                    </button>
-
-
-                    <button
-                        onclick="roadView(
-                            ${item.lat},
-                            ${item.lng}
-                        )"
-                        style="
-                            flex:1;
-                            padding:6px;
-                            background:#4CAF50;
-                            color:white;
-                            border:none;
-                            border-radius:6px;
-                            font-size:11px;
-                            font-weight:bold;
-                            cursor:pointer;
-                        "
-                    >
-                        👀 로드뷰
-                    </button>
-
-                </div>
-
-            </div>
-        `
-    });
-
 
     // ========================================
     // ④ 이름 클릭 → 상세정보
