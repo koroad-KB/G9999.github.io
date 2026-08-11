@@ -780,17 +780,16 @@ document.getElementById("searchBox")
 
 document.getElementById("allBtn").onclick = function(){
 
-    // 모든 Marker 복구
+    clusterer.clear();
+
     markers.forEach(function(marker){
         marker.setMap(map);
     });
 
+    clusterer.addMarkers(markers);
 
-    // 현재 줌 단계에 맞게 이름 복구
     updateOverlayVisible();
 
-
-    // 인천 전체가 적당히 보이도록 이동
     map.setCenter(
         new kakao.maps.LatLng(
             37.4563,
