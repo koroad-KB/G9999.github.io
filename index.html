@@ -589,23 +589,70 @@ document.getElementById("gpsBtn").onclick = function(){
     );
 
 };
-document.getElementById("searchBtn").onclick=function(){
+document.getElementById("searchBtn").onclick = function(){
 
     const searchBox = document.getElementById("searchBox");
-
     const keyword = searchBox.value.trim();
 
-    if(keyword == "") {
+    if(keyword === ""){
         searchBox.blur();
         return;
     }
 
- const item = signalData.find(x =>
-    (x.name && x.name.includes(keyword)) ||
-    (String(x.code).includes(keyword)) ||
-    (String(x.group).includes(keyword))
-);
+    // ========================================
+    // ① 신호기군 검색
+    // ========================================
+    const groupResults = signalData.filter(item =>
+        String(item.group || "").trim().toUpperCase() === keyword.toUpperCase()
+    );
 
+
+    // ========================================
+    // ② 신호기군이 검색된 경우
+    // ========================================
+    if(groupResults.length > 0){
+
+        // 기존 지도 위치를 기준으로 전체 신호군이 보이도록 설정
+        const bounds = new kakao.maps.LatLngBounds();
+
+        groupResults.forEach(item => {
+
+            const position = new kakao.maps.LatLng(
+                Number(item.lat),
+                Number(item.lng)
+            );
+
+            bounds.extend(position);
+
+        });
+
+        // 해당 신호군 전체가 화면에 들어오도록 이동
+        map.setBounds(bounds);
+
+        // 너무 확대되는 것을 방지
+        if(groupResults.length === 1){
+            map.setLevel(4);
+        }
+
+        searchBox.value = "";
+        searchBox.blur();
+
+        return;
+    }
+
+
+    // ========================================
+    // ③ 신호기명 / 신호기코드 검색
+    // ========================================
+    const item = signalData.find(x =>
+        (x.name && String(x.name).includes(keyword)) ||
+        String(x.code || "").includes(keyword)
+    );
+
+
+    // ========================================
+    // ④ 검색 결과 없음
+    // ========================================
     if(!item){
 
         alert("검색 결과가 없습니다.");
@@ -615,17 +662,21 @@ document.getElementById("searchBtn").onclick=function(){
         return;
     }
 
-    map.setCenter(
-        new kakao.maps.LatLng(
-            Number(item.lat),
-            Number(item.lng)
-        )
+
+    // ========================================
+    // ⑤ 개별 신호기 위치로 이동
+    // ========================================
+    const position = new kakao.maps.LatLng(
+        Number(item.lat),
+        Number(item.lng)
     );
+
+    map.setCenter(position);
 
     map.setLevel(2);
 
-searchBox.value = ""; 
-searchBox.blur();
+    searchBox.value = "";
+    searchBox.blur();
 
 };
 document.getElementById("searchBox").addEventListener("keydown",function(e){
