@@ -495,13 +495,24 @@ let myLocationMarker = null;
 
     overlays.forEach(function(overlay){
 
-        if(level >= 7){
-            overlay.setMap(null);      // 이름 숨김
-        }else{
-            overlay.setMap(map);       // 이름 표시
+groupResults.forEach(function(item){
+
+    const index = signalData.indexOf(item);
+
+    if(index !== -1){
+
+        if(markers[index]){
+            markers[index].setMap(map);
+            groupMarkers.push(markers[index]);
         }
 
-    });
+        if(overlays[index]){
+            overlays[index].setMap(map);
+        }
+
+    }
+
+});
 
 }
 document.getElementById("gpsBtn").onclick = function(){
