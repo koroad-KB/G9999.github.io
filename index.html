@@ -207,8 +207,10 @@ html, body, #map {
 <script>
 let currentInfoWindow = null;  
 let signalData = [];
-  let markers = [];
+let markers = [];
 let overlays = [];
+let clusterer = null;
+  
 
 let clickMarker = null;
 let clickLat = "";
@@ -467,19 +469,26 @@ const infowindow = new kakao.maps.InfoWindow({
 
 });
 
-let clusterer = null;
-  
 clusterer = new kakao.maps.MarkerClusterer({
 
-map:map,
+    map: map,
 
-averageCenter:true,
+    averageCenter: true,
 
-minLevel:7
+    minLevel: 7
 
 });
 
 clusterer.addMarkers(markers);
+
+
+updateOverlayVisible();
+
+kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
+
+});
+
+let myLocationMarker = null;
   function updateOverlayVisible(){
 
     const level = map.getLevel();
@@ -495,15 +504,6 @@ clusterer.addMarkers(markers);
     });
 
 }
-
-updateOverlayVisible();
-
-kakao.maps.event.addListener(map, "zoom_changed", updateOverlayVisible);
-
-});
-
-let myLocationMarker = null;
-
 document.getElementById("gpsBtn").onclick = function(){
 
     if(!navigator.geolocation){
