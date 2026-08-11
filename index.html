@@ -210,6 +210,7 @@ let signalData = [];
 let markers = [];
 let overlays = [];
 let clusterer = null;
+  let selectedGroup = null;
   
 
 let clickMarker = null;
@@ -501,8 +502,42 @@ function updateOverlayVisible(){
 
     const level = map.getLevel();
 
-    overlays.forEach(function(overlay){
+    overlays.forEach(function(overlay, index){
 
+        // =====================================
+        // 신호군 검색 상태
+        // =====================================
+        if(selectedGroup !== null){
+
+            const item = signalData[index];
+
+            if(
+                item &&
+                String(item.group || "").trim().toUpperCase()
+                === selectedGroup
+            ){
+
+                // 검색된 신호군만 표시
+                if(level >= 7){
+                    overlay.setMap(null);
+                }else{
+                    overlay.setMap(map);
+                }
+
+            }else{
+
+                // 다른 신호군은 계속 숨김
+                overlay.setMap(null);
+
+            }
+
+            return;
+        }
+
+
+        // =====================================
+        // 일반 상태
+        // =====================================
         if(level >= 7){
 
             overlay.setMap(null);
@@ -646,7 +681,7 @@ document.getElementById("searchBtn").onclick = function(){
 
 
 if(groupResults.length > 0){
-
+selectedGroup = keyword.toUpperCase();
     // 기존 클러스터 제거
     if(clusterer){
         clusterer.clear();
@@ -769,7 +804,7 @@ if(groupResults.length > 0){
     // =========================================
     // ③ 전체 장비 다시 표시
     // =========================================
-
+selectedGroup = null;
     if(clusterer){
         clusterer.clear();
     }
@@ -834,6 +869,7 @@ document.getElementById("searchBox")
 // ========================================
 
 document.getElementById("allBtn").onclick = function(){
+  selectedGroup = null;
 
     if(clusterer){
         clusterer.clear();
