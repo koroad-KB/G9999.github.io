@@ -632,54 +632,70 @@ document.getElementById("searchBtn").onclick = function(){
     });
 
 
-    if(groupResults.length > 0){
+  if(groupResults.length > 0){
 
-        // 기존 모든 장비 숨기기
-        markers.forEach(function(marker){
-            marker.setMap(null);
-        });
+    // 클러스터에서 모든 마커 제거
+    clusterer.clear();
 
-        overlays.forEach(function(overlay){
-            overlay.setMap(null);
-        });
+    // 모든 마커 숨기기
+    markers.forEach(function(marker){
+        marker.setMap(null);
+    });
 
-        // 검색된 신호군만 표시
-        groupResults.forEach(function(item){
-
-            const index = signalData.indexOf(item);
-
-            if(markers[index]){
-                markers[index].setMap(map);
-            }
-
-            if(overlays[index]){
-                overlays[index].setMap(map);
-            }
-
-        });
+    // 모든 이름 숨기기
+    overlays.forEach(function(overlay){
+        overlay.setMap(null);
+    });
 
 
-        // 검색된 신호군 전체가 보이도록 범위 설정
-        const bounds = new kakao.maps.LatLngBounds();
+    // 검색된 신호군만 표시
+    const groupMarkers = [];
 
-        groupResults.forEach(function(item){
+    groupResults.forEach(function(item){
 
-            bounds.extend(
-                new kakao.maps.LatLng(
-                    Number(item.lat),
-                    Number(item.lng)
-                )
-            );
+        const index = signalData.indexOf(item);
 
-        });
+        if(markers[index]){
 
-        map.setBounds(bounds);
+            markers[index].setMap(map);
 
-        searchBox.value = "";
-        searchBox.blur();
+            groupMarkers.push(markers[index]);
 
-        return;
-    }
+        }
+
+        if(overlays[index]){
+            overlays[index].setMap(map);
+        }
+
+    });
+
+
+    // 검색된 장비만 클러스터링
+    clusterer.addMarkers(groupMarkers);
+
+
+    // 검색 결과 전체가 화면에 들어오도록
+    const bounds = new kakao.maps.LatLngBounds();
+
+    groupResults.forEach(function(item){
+
+        bounds.extend(
+            new kakao.maps.LatLng(
+                Number(item.lat),
+                Number(item.lng)
+            )
+        );
+
+    });
+
+    map.setBounds(bounds);
+
+
+    searchBox.value = "";
+    searchBox.blur();
+
+    return;
+}
 
 
     // ====================================
