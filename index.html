@@ -274,8 +274,10 @@ data.forEach(item => {
         cursor:pointer;
     `;
 
-    nameDiv.innerHTML = item.name;
-
+ nameDiv.innerHTML =
+    item.code + "(" +
+    item.group + ")-" +
+    item.name;
 
     // ========================================
     // ② 이름을 실제 좌표의 정확한 중심에 배치
@@ -298,19 +300,90 @@ data.forEach(item => {
 
 
 
-    const infowindow = new kakao.maps.InfoWindow({
+const infowindow = new kakao.maps.InfoWindow({
 
-        content: `
+    content: `
+        <div style="
+            padding:12px;
+            font-size:14px;
+            line-height:1.7;
+            min-width:220px;
+        ">
+
             <div style="
-                padding:10px;
-                font-size:16px;
-                line-height:1.6;
-                min-width:180px;
+                font-size:17px;
+                font-weight:bold;
+                margin-bottom:8px;
+                border-bottom:1px solid #ddd;
+                padding-bottom:6px;
+            ">
+                ${item.code}(${item.group})-${item.name}
+            </div>
+
+            <div>
+                <b>지역</b> : ${item.region || "-"}<br>
+
+                <b>지자체</b> : ${item.local || "-"}<br>
+
+                <b>경찰서</b> : ${item.police || "-"}<br>
+
+                <b>보호구역</b> : ${item.protectedArea || "-"}<br>
+
+                <b>스마트교차로</b> : ${item.smart || "-"}
+            </div>
+
+            <br>
+
+            <div style="
+                display:flex;
+                gap:6px;
             ">
 
-                <b>${item.name}</b><br>
+                <button
+                    onclick="routeTo(
+                        ${item.lat},
+                        ${item.lng},
+                        '${item.name}'
+                    )"
+                    style="
+                        flex:1;
+                        padding:7px;
+                        background:#FEE500;
+                        border:none;
+                        border-radius:6px;
+                        font-size:11px;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    🧭 길찾기
+                </button>
 
-                수정날짜 : ${item.type}<br><br>
+                <button
+                    onclick="roadView(
+                        ${item.lat},
+                        ${item.lng}
+                    )"
+                    style="
+                        flex:1;
+                        padding:7px;
+                        background:#4CAF50;
+                        color:white;
+                        border:none;
+                        border-radius:6px;
+                        font-size:11px;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    📷 로드뷰
+                </button>
+
+            </div>
+
+        </div>
+    `
+});
 
                 <div style="
                     display:flex;
@@ -581,9 +654,11 @@ document.getElementById("searchBtn").onclick=function(){
         return;
     }
 
-    const item = signalData.find(x =>
-        x.name && x.name.includes(keyword)
-    );
+ const item = signalData.find(x =>
+    (x.name && x.name.includes(keyword)) ||
+    (String(x.code).includes(keyword)) ||
+    (String(x.group).includes(keyword))
+);
 
     if(!item){
 
