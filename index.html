@@ -1075,6 +1075,21 @@ document.getElementById("searchBox")
 // ========================================
 
 document.getElementById("allBtn").onclick = function(){
+  
+      // ========================================
+    // ⭐ 주소/장소 검색 결과 제거
+    // ========================================
+
+    if(searchMarker){
+        searchMarker.setMap(null);
+        searchMarker = null;
+    }
+
+    if(searchInfoWindow){
+        searchInfoWindow.close();
+        searchInfoWindow = null;
+    }
+
 
     // ⭐ 신호군 검색 상태 해제
     selectedGroup = null;
