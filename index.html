@@ -666,6 +666,7 @@ document.getElementById("searchBtn").onclick = function(){
         return;
     }
 
+
     // =========================================
     // ① 신호군 검색
     // 예 : 996G
@@ -680,95 +681,97 @@ document.getElementById("searchBtn").onclick = function(){
     });
 
 
-if(groupResults.length > 0){
-selectedGroup = keyword.toUpperCase();
-    // 기존 클러스터 제거
-    if(clusterer){
-        clusterer.clear();
-    }
+    if(groupResults.length > 0){
 
-    // 모든 장비 숨기기
-    markers.forEach(function(marker){
-        marker.setMap(null);
-    });
+        selectedGroup = keyword.toUpperCase();
 
-    // 모든 이름 숨기기
-    overlays.forEach(function(overlay){
-        overlay.setMap(null);
-    });
-
-
-    // 검색된 신호군만 표시
-    const groupMarkers = [];
-
-    groupResults.forEach(function(item){
-
-        const index = signalData.indexOf(item);
-
-        if(index !== -1){
-
-            if(markers[index]){
-                markers[index].setMap(map);
-                groupMarkers.push(markers[index]);
-            }
-
-            if(overlays[index]){
-                overlays[index].setMap(map);
-            }
-
+        if(clusterer){
+            clusterer.clear();
         }
 
-    });
+        // 모든 마커 숨기기
+        markers.forEach(function(marker){
+            marker.setMap(null);
+        });
+
+        // 모든 이름 숨기기
+        overlays.forEach(function(overlay){
+            overlay.setMap(null);
+        });
 
 
-    // 검색된 신호군만 클러스터링
-    if(clusterer){
-        clusterer.addMarkers(groupMarkers);
-    }
-
-
-    // 검색된 신호군 전체가 보이도록
-    const bounds = new kakao.maps.LatLngBounds();
-
-    groupResults.forEach(function(item){
-
-        bounds.extend(
-            new kakao.maps.LatLng(
-                Number(item.lat),
-                Number(item.lng)
-            )
-        );
-
-    });
-
-    map.setBounds(bounds);
-
-
-    // 이름이 보이도록 최소 6단계까지 확대
-    setTimeout(function(){
-
-        if(map.getLevel() > 6){
-            map.setLevel(6);
-        }
+        // 검색된 신호군만 표시
+        const groupMarkers = [];
 
         groupResults.forEach(function(item){
 
             const index = signalData.indexOf(item);
 
-            if(overlays[index]){
-                overlays[index].setMap(map);
+            if(index !== -1){
+
+                if(markers[index]){
+                    markers[index].setMap(map);
+                    groupMarkers.push(markers[index]);
+                }
+
+                if(overlays[index]){
+                    overlays[index].setMap(map);
+                }
+
             }
 
         });
 
-    }, 100);
+
+        // 검색된 신호군만 클러스터링
+        if(clusterer){
+            clusterer.addMarkers(groupMarkers);
+        }
 
 
-    searchBox.value = "";
-    searchBox.blur();
+        // 신호군 전체가 보이도록
+        const bounds = new kakao.maps.LatLngBounds();
 
-    return;
-}
+        groupResults.forEach(function(item){
+
+            bounds.extend(
+                new kakao.maps.LatLng(
+                    Number(item.lat),
+                    Number(item.lng)
+                )
+            );
+
+        });
+
+        map.setBounds(bounds);
+
+
+        // 너무 넓게 잡히면 확대
+        setTimeout(function(){
+
+            if(map.getLevel() > 6){
+                map.setLevel(6);
+            }
+
+            groupResults.forEach(function(item){
+
+                const index = signalData.indexOf(item);
+
+                if(overlays[index]){
+                    overlays[index].setMap(map);
+                }
+
+            });
+
+        }, 100);
+
+
+        searchBox.value = "";
+        searchBox.blur();
+
+        return;
+    }
+
 
 
     // =========================================
@@ -779,6 +782,7 @@ selectedGroup = keyword.toUpperCase();
     const item = signalData.find(function(x){
 
         return (
+
             String(x.code || "")
                 .trim()
                 .includes(keyword) ||
@@ -786,30 +790,73 @@ selectedGroup = keyword.toUpperCase();
             String(x.name || "")
                 .trim()
                 .includes(keyword)
+
         );
 
     });
 
 
-    if(!item){
+    if(item){
 
-        alert("검색 결과가 없습니다.");
+        // 검색 상태 해제
+        selectedGroup = null;
 
+        if(clusterer){
+            clusterer.clear();
+        }
+
+
+        // 모든 마커 표시
+        markers.forEach(function(marker){
+            marker.setMap(map);
+        });
+
+
+        // 전체 클러스터링
+        if(clusterer){
+            clusterer.addMarkers(markers);
+        }
+
+
+        // 이름 표시
+        updateOverlayVisible();
+
+
+        // 검색된 신호기로 이동
+        const position = new kakao.maps.LatLng(
+            Number(item.lat),
+            Number(item.lng)
+        );
+
+        map.setCenter(position);
+
+        // 신호기 검색은 좀 더 확대
+        map.setLevel(4);
+
+
+        searchBox.value = "";
         searchBox.blur();
 
         return;
     }
 
 
+
     // =========================================
-    // ③ 전체 장비 다시 표시
+    // ③ 여기부터 주소 / 지번 / 장소 검색
     // =========================================
-selectedGroup = null;
+
+    // 신호군 / 신호기 검색이 아니므로
+    // 전체 상태로 변경
+    selectedGroup = null;
+
+
     if(clusterer){
         clusterer.clear();
     }
 
 
+    // 모든 신호기 표시
     markers.forEach(function(marker){
         marker.setMap(map);
     });
@@ -820,30 +867,189 @@ selectedGroup = null;
     }
 
 
-    // 이름 표시
     updateOverlayVisible();
 
 
+
     // =========================================
-    // ④ 검색된 신호기로 이동
+    // ④ 주소 검색 객체
     // =========================================
 
-    const position = new kakao.maps.LatLng(
-        Number(item.lat),
-        Number(item.lng)
+    const geocoder = new kakao.maps.services.Geocoder();
+
+
+    // =========================================
+    // ⑤ 먼저 주소 검색
+    // 도로명주소 / 지번주소
+    // =========================================
+
+    geocoder.addressSearch(
+        keyword,
+
+        function(result, status){
+
+            if(status === kakao.maps.services.Status.OK){
+
+                const lat = Number(result[0].y);
+                const lng = Number(result[0].x);
+
+                const position =
+                    new kakao.maps.LatLng(lat, lng);
+
+
+                // 지도 이동
+                map.setCenter(position);
+
+                // 주소 검색은 조금 확대
+                map.setLevel(4);
+
+
+                // 검색 위치 표시
+                showSearchMarker(
+                    position,
+                    keyword
+                );
+
+
+                searchBox.value = "";
+                searchBox.blur();
+
+                return;
+            }
+
+
+            // =====================================
+            // ⑥ 주소 검색 실패
+            // → 장소 검색으로 넘어감
+            // =====================================
+
+            const places =
+                new kakao.maps.services.Places();
+
+
+            places.keywordSearch(
+                keyword,
+
+                function(result, status){
+
+                    if(
+                        status ===
+                        kakao.maps.services.Status.OK
+                    ){
+
+                        const place = result[0];
+
+                        const position =
+                            new kakao.maps.LatLng(
+                                Number(place.y),
+                                Number(place.x)
+                            );
+
+
+                        // 지도 이동
+                        map.setCenter(position);
+
+                        map.setLevel(4);
+
+
+                        // 검색 위치 표시
+                        showSearchMarker(
+                            position,
+                            place.place_name
+                        );
+
+
+                        searchBox.value = "";
+                        searchBox.blur();
+
+                        return;
+
+                    }
+
+
+                    // =================================
+                    // ⑦ 전부 검색 실패
+                    // =================================
+
+                    alert(
+                        "검색 결과가 없습니다.\n\n" +
+                        "신호기 번호, 신호군, 주소,\n" +
+                        "지번 또는 장소명을 입력해 주세요."
+                    );
+
+                    searchBox.blur();
+
+                }
+
+            );
+
+        }
+
     );
 
-    map.setCenter(position);
-
-    // 신호기 이름이 보이는 단계
-    map.setLevel(4);
-
-
-    searchBox.value = "";
-    searchBox.blur();
-
 };
+let searchMarker = null;
+let searchInfoWindow = null;
 
+function showSearchMarker(position, title){
+
+    // 기존 검색 마커 제거
+    if(searchMarker){
+        searchMarker.setMap(null);
+    }
+
+    // 기존 검색 인포윈도우 제거
+    if(searchInfoWindow){
+        searchInfoWindow.close();
+    }
+
+    // 검색 위치 마커
+    searchMarker = new kakao.maps.Marker({
+        map: map,
+        position: position
+    });
+
+    // 검색 결과 정보창
+    searchInfoWindow = new kakao.maps.InfoWindow({
+
+        content:
+            '<div style="' +
+            'padding:8px 12px;' +
+            'font-size:13px;' +
+            'font-weight:bold;' +
+            'white-space:nowrap;' +
+            '">' +
+            title +
+            '</div>'
+
+    });
+
+    searchInfoWindow.open(
+        map,
+        searchMarker
+    );
+}
+
+
+
+// ========================================
+// Enter 키 검색
+// ========================================
+
+document.getElementById("searchBox")
+.addEventListener("keydown", function(e){
+
+    if(e.key === "Enter"){
+
+        e.preventDefault();
+
+        document.getElementById("searchBtn").click();
+
+        this.blur();
+
+    }
+
+});
 // ========================================
 // Enter 키 검색
 // ========================================
